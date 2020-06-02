@@ -1,0 +1,117 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{fullpage}
+\usepackage[noline, french, onelanguage, noend]{algorithm2e}
+\usepackage[top=2cm, bottom=4.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\hypersetup{%
+  colorlinks=true,
+  linkcolor=blue,
+  linkbordercolor={0 0 1}
+}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\algskip}{\vspace{3pt}}
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand\lstlistingname{Algorithm}
+\renewcommand\lstlistlistingname{Algorithms}
+\def\lstlistingautorefname{Alg.}
+
+\lstdefinestyle{Python}{
+    language        = Python,
+    frame           = lines, 
+    basicstyle      = \footnotesize,
+    keywordstyle    = \color{blue},
+    stringstyle     = \color{green},
+    commentstyle    = \color{red}\ttfamily
+}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+
+% Edit these as appropriate
+\newcommand\course{IFT436}
+\newcommand\hwnumber{6}                  % <-- homework number
+\newcommand\NetIDa{boue2327}           % <-- NetID of person #1
+\newcommand\NetIDb{valr2802}           % <-- NetID of person #2 (Comment this line out for problem sets)
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{\NetIDa}
+\lhead{\NetIDa\\\NetIDb}                 % <-- Comment this line out for problem sets (make sure you are person #1)
+\chead{\textbf{\Large Devoir \hwnumber}}
+\rhead{\course \\ 5 décembre 2019}
+\lfoot{}
+\cfoot{}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\begin{document}
+
+\section*{Question 1}
+
+(a) L'algorithme est de Monte Carlo, puisque le temps d'exécution est borné par la valeur de $k$, permettant alors de possiblement retourner une valeur erronée.\newline
+
+(b) Il y a trois situations à prendre en compte : \newline
+
+1 - La probabilité que toutes les valeurs soient différentes est de $\frac{3!}{27}$\newline
+2 - La probabilité que toutes les valeurs soient 42 est de : $\frac{1}{27}$\newline
+3 - La probabilité que 42 se retrouve dans la liste est de : $\frac{3(1\cdot 2!)}{27}$\newline
+
+Le $27$ vient de $3^3$. Donc la probabilité totale est de $\frac{13}{27}$.\newline
+
+(c) Si $k = 1$, alors il y a $\frac{1}{2}$ probabilité de faire un erreur, car on ne choisi qu'un seul élément de $s$, et la moitié des éléments de $s$ ne sont pas raisonnables.\newline
+
+Si $k = 3$, il y a 4 possiblités d'erreur ("-" et "+" signifie rang non acceptable (trop petit ou trop grand) pour être raisonnable):\newline
+
+1 : -, -, - où la probabilité est de $(\frac{1}{4})^3$\newline
+2 : -, -, x (où x est soit rang acceptable ou "+") où la probabilité est de $\dbinom{3}{2} \cdot (\frac{1}{4})^2 \cdot \frac{3}{4}$\newline
+3 : +, +, + où la probabilité est de $(\frac{1}{4})^3$\newline
+4 : x, +, + (où x est soit rang acceptable ou "-") où la probabilité est de $\dbinom{3}{2} \cdot (\frac{1}{4})^2 \cdot \frac{3}{4}$\newline
+
+Le total est donc $\frac{9}{64} + \frac{1}{64} + \frac{9}{64} + \frac{1}{64} = 2 \cdot (\frac{9}{64} + \frac{1}{64}) = \frac{5}{16}$.\newline
+
+Si $k = k$, alors la formule est : $2 \cdot \sum_{n = \ceil*{\frac{k}{2}}}^{k} \dbinom{k}{n} \cdot (\frac{1}{4})^n \cdot (\frac{3}{4})^{k-n}$. La formule suit la même logique que lorsque $k = 3$.\newline
+
+En effet, le $n$ parmi $k$ représente le nombre de combinaisons de soit + ou -, le $(\frac{1}{4})^n$ représente la possibilité d'obtenir les éléments non responsable et le $(\frac{3}{4})^{k-n}$ représente la possibilité de l'autre ou des autres élément(s). La sommation indique que le + ou - se promène, vers la droite de la séquence, puisque qu'il y a erreur seulement s'il y a un élément - ou + à $t[\ceil*{\frac{k}{2}}]$, ce qui est la raison de $n = \ceil*{\frac{k}{2}}$. Finalement, la multiplication par $2$ représente le fait que c'est le calcul sera le même pour le cas de + et le cas de -.
+\newpage
+(d)\newline
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\LinesNumbered
+\KwIn{Élément $x \in s$ et la séquence $s$}
+\KwResult{Si $x$ est un élément raisonnable de $s$}
+\algskip
+
+\SetKwFunction{algo}{algo}
+\SetKwProg{myproc}{}{}{}
+\myproc{\algo{$x, s$}$\mathtt{:}$}{
+	position $\leftarrow 1$\;	
+	\For{élément $i \in s$}{
+		\If{$i < x$}{
+			$position \leftarrow position + 1$
+		}
+	}
+	\If{position $> \ceil*{\frac{|s|}{4}} \land $ position $\leq \floor*{\frac{3 \cdot |s|}{4}}$}{
+		\Return{vrai}	
+	}\Else{
+		\Return{faux}
+	}
+}
+\end{algorithm}
+
+(e) On a calculé en (c), que la probabilité d'erreur pour $k=3$ était de $\frac{5}{16}$, donc la probabilité de succès est de $1 - \frac{5}{16} = \frac{11}{16}$. L'espérance est donc de $\frac{1}{p} = \frac{1}{\frac{11}{16}} = \frac{16}{11}$, donc l'algorithme fonctionnera en $\O(\frac{16}{11}n) = \O(n)$.
+\end{document}
