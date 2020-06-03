@@ -23,9 +23,6 @@ import numpy as np
 #
 # retour: Un tuple contenant un booléen indiquant si il y a eu des changements et le csp.
 ###
-def contrainte(Xi, Xj):
-    return Xi != Xj
-
 def reviser(Xi, Xj, csp):
     revise = False
     for x in csp.domaines[Xi]:
