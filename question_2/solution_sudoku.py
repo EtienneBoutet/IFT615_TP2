@@ -49,13 +49,14 @@ def AC3(csp):
         revise, csp = reviser(Xi, Xj, csp)
         if revise:
             if len(csp.domaines[Xi]) == 0:
-                return csp, False
+                return None, False
             else:
                 for Xk in csp.contraintes[Xi]:
                     if Xk != Xj:
                         file_arcs.append((Xk, Xi))
 
     return csp, True
+
 
 #####
 # est_compatible: Fonction vérifiant la légalité d'une affectation.
@@ -95,7 +96,8 @@ def backtrack(assignations, csp):
     if len(assignations) == len(csp.variables):
         return assignations
 
-    X = var_non_assignee(assignations, csp)
+    non_assignees = [v for v in csp.variables if v not in assignations]
+    X = min(non_assignees, key=lambda var: len(csp.domaines[var]))
 
     for v in valeurs_ordonnees(X, csp):
         if est_compatible(X, v, assignations, csp):
@@ -111,16 +113,8 @@ def backtrack(assignations, csp):
     return False
 
 
-def var_non_assignee(assignations, csp):
-    non_assignees = [v for v in csp.variables if v not in assignations]
-    return min(non_assignees, key=lambda var: len(csp.domaines[var]))
-
-
 def valeurs_ordonnees(variable, csp):
-    if len(csp.domaines[variable]) == 1:
-        return csp.domaines[variable]
-    else:
-        return sorted(csp.domaines[variable], key=lambda valeur: nombres_conflits(csp, variable, valeur))
+    return sorted(csp.domaines[variable], key=lambda valeur: nombres_conflits(csp, variable, valeur))
 
 
 def nombres_conflits(csp, variable, valeur):
