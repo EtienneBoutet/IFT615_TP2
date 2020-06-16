@@ -96,10 +96,14 @@ def backtrack(assignations, csp):
     if len(assignations) == len(csp.variables):
         return assignations
 
-    non_assignees = [v for v in csp.variables if v not in assignations]
-    X = min(non_assignees, key=lambda var: len(csp.domaines[var]))
+    X = None
+    # Trouver une variable non-assignée.
+    for v in csp.variables:
+        if v not in assignations:
+            X = v
+            break
 
-    for v in valeurs_ordonnees(X, csp):
+    for v in csp.domaines[X]:
         if est_compatible(X, v, assignations, csp):
             assignations[X] = v
             csp.domaines[X] = [v]
@@ -111,21 +115,6 @@ def backtrack(assignations, csp):
             del assignations[X]
 
     return False
-
-
-def valeurs_ordonnees(variable, csp):
-    return sorted(csp.domaines[variable], key=lambda valeur: nombres_conflits(csp, variable, valeur))
-
-
-def nombres_conflits(csp, variable, valeur):
-    nombre = 0
-
-    for voisin in csp.contraintes[variable]:
-        if len(csp.domaines[voisin]) > 1 and valeur in csp.domaines[voisin]:
-            nombre += 1
-
-    return nombre
-
 
 #####
 # backtracking_search : Fonction coquille pour la fonction 'backtrack'.
